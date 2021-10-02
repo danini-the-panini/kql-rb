@@ -1,0 +1,25 @@
+PATH
+  remote: .
+  specs:
+    kql (0.1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    kdl (1.0.0.rc1)
+    minitest (5.14.4)
+    racc (1.5.2)
+    rake (13.0.6)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  kdl (= 1.0.0.rc1)
+  kql!
+  minitest (~> 5.0)
+  racc (~> 1.5)
+  rake (~> 13.0)
+
+BUNDLED WITH
+   2.2.22

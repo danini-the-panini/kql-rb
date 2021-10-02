@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "kql/version"
+require_relative "kql/tokenizer"
 
-module Kql
-  class Error < StandardError; end
-  # Your code goes here...
+module KQL
 end
