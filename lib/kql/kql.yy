@@ -70,7 +70,7 @@ rule
                    | ENDS_WITH   { ::KQL::Operator::EndsWith }
                    | INCLUDES    { ::KQL::Operator::Includes }
 
-  mapping : accessor                    { [val[0]] }
+  mapping : accessor
           | LPAREN mapping_tuple RPAREN { val[1] }
 
   mapping_tuple : accessor COMMA mapping_tuple { [val[0], *val[2]] }
@@ -82,7 +82,7 @@ rule
 
   prop : PROP LPAREN IDENT RPAREN { ::KQL::Accessor::Prop.new(val[2].value) }
 
-  val : VAL LPAREN RPAREN         { ::KQL::Accessor::Val.new(nil) }
+  val : VAL LPAREN RPAREN         { ::KQL::Accessor::Val.new(0) }
       | VAL LPAREN INTEGER RPAREN { ::KQL::Accessor::Val.new(val[2].value) }
 
 ---- inner

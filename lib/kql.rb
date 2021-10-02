@@ -8,6 +8,7 @@ require_relative "kql/combinator"
 require_relative "kql/selector"
 require_relative "kql/matcher"
 require_relative "kql/accessor"
+require_relative "kql/operator"
 require_relative "kql/kql.tab"
 
 module KQL

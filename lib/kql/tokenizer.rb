@@ -159,6 +159,15 @@ module KQL
             else
               return token(:TILDE, '~').tap { traverse(1) }
             end
+          when '!'
+            case n
+            when '='
+              return token(:NOT_EQUALS, '!=').tap { traverse(2) }
+            else
+              self.context = :ident
+              @buffer = c
+              traverse(1)
+            end
           when *SYMBOLS.keys
             return token(SYMBOLS[c], c).tap { traverse(1) }
           when *WHITESPACE

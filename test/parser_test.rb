@@ -34,22 +34,39 @@ class ParserTest < Minitest::Test
 
   def test_matchers
     assert_equal q(sel(matchers: [any])), @parser.parse('[]')
-    assert_equal q(sel(matchers: [val()])), @parser.parse('[val()]')
+    assert_equal q(sel(matchers: [val(0)])), @parser.parse('[val()]')
     assert_equal q(sel(matchers: [val(1)])), @parser.parse('[val(1)]')
     assert_equal q(sel(matchers: [prop('foo')])), @parser.parse('[prop(foo)]')
     assert_equal q(sel(matchers: [prop('foo')])), @parser.parse('[foo]')
+  end
+
+  def test_binary_matchers
+    assert_equal q(sel(matchers: [m(val(0), :==, 1)])), @parser.parse('[val() = 1]')
+    assert_equal q(sel(matchers: [m(prop('name'), :==, 1)])), @parser.parse('[prop(name) = 1]')
+    assert_equal q(sel(matchers: [m(prop('name'), :==, 1)])), @parser.parse('[name = 1]')
+    assert_equal q(sel(matchers: [m(::KQL::Accessor::Name, :==, 'foo')])), @parser.parse('[name() = "foo"]')
+    assert_equal q(sel(matchers: [m(::KQL::Accessor::Tag, :==, 'foo')])), @parser.parse('[tag() = "foo"]')
+    assert_equal q(sel(matchers: [m(val(0), :!=, 1)])), @parser.parse('[val() != 1]')
+    assert_equal q(sel(matchers: [m(val(0), :==, ::KQL::Matcher::Tag.new('foo'))])), @parser.parse('[val() = (foo)]')
+  end
+
+  def test_numeric_matchers
+    assert_equal q(sel(matchers: [m(val(0), :>, 1)])), @parser.parse('[val() > 1]')
+    assert_equal q(sel(matchers: [m(val(0), :>=, 1)])), @parser.parse('[val() >= 1]')
+    assert_equal q(sel(matchers: [m(val(0), :<, 1)])), @parser.parse('[val() < 1]')
+    assert_equal q(sel(matchers: [m(val(0), :<=, 1)])), @parser.parse('[val() <= 1]')
+  end
+
+  def test_string_matchers
+    assert_equal q(sel(matchers: [m(val(0), :A=, 'foo')])), @parser.parse('[val() ^= "foo"]')
+    assert_equal q(sel(matchers: [m(val(0), :z=, 'foo')])), @parser.parse('[val() $= "foo"]')
+    assert_equal q(sel(matchers: [m(val(0), :i=, 'foo')])), @parser.parse('[val() *= "foo"]')
   end
 
   private
 
   def q(*alternatives)
     ::KQL::Query.new(alternatives)
-  end
-
-  def m(h)
-    raise 'Exactly one key is required!' unless h.size == 1
-
-    ::KQL::Mapping.new(h.keys.first, h.values.first)
   end
 
   def combinator(com)
@@ -59,6 +76,21 @@ class ParserTest < Minitest::Test
     when :~ then ::KQL::Combinator::Sibling
     when :+ then ::KQL::Combinator::ImmediateSibling
     else raise "unknown combinator #{com}"
+    end
+  end
+
+  def operator(op)
+    case op
+    when :== then ::KQL::Operator::Equals
+    when :!= then ::KQL::Operator::NotEquals
+    when :>= then ::KQL::Operator::GreaterThanOrEqual
+    when :>  then ::KQL::Operator::GreaterThan
+    when :<= then ::KQL::Operator::LessThanOrEqual
+    when :<  then ::KQL::Operator::LessThan
+    when :A= then ::KQL::Operator::StartsWith
+    when :z= then ::KQL::Operator::EndsWith
+    when :i= then ::KQL::Operator::Includes
+    else "raise unknown operator #{op}"
     end
   end
 
@@ -98,7 +130,7 @@ class ParserTest < Minitest::Test
     ::KQL::Filter.new(node: node, tag: tag, matchers: matchers)
   end
 
-  def val(index = nil)
+  def val(index)
     ::KQL::Accessor::Val.new(index)
   end
 
@@ -108,5 +140,10 @@ class ParserTest < Minitest::Test
 
   def any
     ::KQL::Matcher::Any
+  end
+
+  def m(acc, op, val)
+    val = val.is_a?(::KQL::Matcher) ? val : ::KQL::Matcher::Value.new(val)
+    ::KQL::Matcher::Comparison.new(acc, operator(op), val)
   end
 end
