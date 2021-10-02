@@ -61,16 +61,12 @@ class TokenizerTest < Minitest::Test
     assert_equal t(:COMMA, ','), tokenizer.next_token
     assert_equal t(:PROPS, 'props()'), tokenizer.next_token
     assert_equal t(:RPAREN, ')'), tokenizer.next_token
-    assert_equal eof(1, 49), tokenizer.next_token
+    assert_equal [false, nil], tokenizer.next_token
   end
 
   private
 
   def t(type, value, line = nil, col = nil)
     [type, ::KQL::Tokenizer::Token.new(type, value, line, col)]
-  end
-
-  def eof(line = nil, col = nil)
-    [:EOF, ::KQL::Tokenizer::Token.new(:EOF, :EOF, line, col)]
   end
 end

@@ -63,7 +63,6 @@ module KQL
       @context = nil
       @index = start
       @buffer = ''
-      @done = false
       @previous_context = nil
       @line = 1
       @column = 1
@@ -150,9 +149,7 @@ module KQL
             @buffer = c
             traverse(1)
           when nil
-            return [false, token(:EOF, :EOF)[1]] if @done
-            @done = true
-            return token(:EOF, :EOF)
+            return [false, nil]
           else
             raise_error "Unexpected `#{c}'"
           end
