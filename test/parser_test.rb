@@ -63,10 +63,21 @@ class ParserTest < Minitest::Test
     assert_equal q(sel(matchers: [m(val(0), :i=, 'foo')])), @parser.parse('[val() *= "foo"]')
   end
 
+  def test_mapping
+    assert_equal map(sel('a') => props()), @parser.parse('a => props()')
+    assert_equal map(sel('a') => [props(), values()]), @parser.parse('a => (props(), values())')
+  end
+
   private
 
   def q(*alternatives)
     ::KQL::Query.new(alternatives)
+  end
+
+  def map(x)
+    raise 'exactly one key required' unless x.size == 1
+
+    ::KQL::Mapping.new([sel(x.keys.first)].flatten, x.values.first)
   end
 
   def combinator(com)
@@ -96,7 +107,11 @@ class ParserTest < Minitest::Test
 
   def sel(*args, filter)
     if args.empty?
-      filter.is_a?(::KQL::Selector) ? filter : ::KQL::Selector.new(f(filter))
+      case filter
+      when ::KQL::Selector then filter
+      when Array then filter.map { |f| sel(f) }
+      else ::KQL::Selector.new(f(filter))
+      end
     elsif args.length == 2
       ::KQL::Selector::Combined.new(f(args[0]), combinator(args[1]), sel(filter))
     else
@@ -140,6 +155,14 @@ class ParserTest < Minitest::Test
 
   def any
     ::KQL::Matcher::Any
+  end
+
+  def props
+    ::KQL::Accessor::Props
+  end
+
+  def values
+    ::KQL::Accessor::Values
   end
 
   def m(acc, op, val)
