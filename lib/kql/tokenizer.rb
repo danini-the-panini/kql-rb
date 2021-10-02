@@ -83,7 +83,7 @@ module KQL
             self.context = :string
             @buffer = ''
             traverse(1)
-          when /[0-9\-+]/
+          when /[0-9\-]/
             self.context = :number
             traverse(1)
             @buffer = c
@@ -136,6 +136,28 @@ module KQL
               self.context = :ident
               @buffer = c
               traverse(1)
+            end
+          when '+'
+            case n
+            when /[0-9]/
+              self.context = :number
+              traverse(1)
+              @buffer = c
+            when IDENTIFIER_CHARS
+              self.context = :ident
+              @buffer = c
+              traverse(1)
+            else
+              return token(:PLUS, '+').tap { traverse(1) }
+            end
+          when '~'
+            case n
+            when IDENTIFIER_CHARS
+              self.context = :ident
+              @buffer = c
+              traverse(1)
+            else
+              return token(:TILDE, '~').tap { traverse(1) }
             end
           when *SYMBOLS.keys
             return token(SYMBOLS[c], c).tap { traverse(1) }

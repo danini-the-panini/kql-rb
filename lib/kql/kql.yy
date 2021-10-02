@@ -39,14 +39,14 @@ rule
   tag : LPAREN IDENT RPAREN { ::KQL::Matcher::Tag.new(val[1].value) }
       | LPAREN RPAREN       { ::KQL::Matcher::AnyTag }
 
-  matchers : matcher
-           | matcher matchers
+  matchers : matcher          { [val[0]] }
+           | matcher matchers { [val[0], *val[1]] }
 
   matcher : LBRACKET matcher_accessor matcher_operator matcher_comparison RBRACKET { ::KQL::Matcher::Comparison.new(val[1], val[2], val[3]) }
           | LBRACKET matcher_accessor RBRACKET                                     { val[1] }
           | LBRACKET RBRACKET                                                      { ::KQL::Matcher::Any }
 
-  matcher_accessor : IDENT { ::KQL::Accessor::Prop.new(val[2].value) }
+  matcher_accessor : IDENT { ::KQL::Accessor::Prop.new(val[0].value) }
                    | prop
                    | val
                    | NAME  { ::KQL::Accessor::Name }
