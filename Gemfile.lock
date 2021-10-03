@@ -6,20 +6,26 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    kdl (1.0.0.rc1)
+    kdl (1.0.2)
+      simpleidn (~> 0.2.1)
     minitest (5.14.4)
     racc (1.5.2)
     rake (13.0.6)
+    simpleidn (0.2.1)
+      unf (~> 0.1.4)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.8)
 
 PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  kdl (= 1.0.0.rc1)
+  kdl (~> 1.0.0)
   kql!
   minitest (~> 5.0)
   racc (~> 1.5)
   rake (~> 13.0)
 
 BUNDLED WITH
-   2.2.22
+   2.2.32

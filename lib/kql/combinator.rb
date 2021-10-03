@@ -1,15 +1,15 @@
 module KQL
   class Combinator
-    class Child < Combinator
+    singleton :Child, Combinator do
     end
 
-    class ImmediateChild < Combinator
+    singleton :ImmediateChild, Combinator do
     end
 
-    class Sibling < Combinator
+    singleton :Sibling, Combinator do
     end
 
-    class ImmediateSibling < Combinator
+    singleton :ImmediateSibling, Combinator do
     end
   end
 end
