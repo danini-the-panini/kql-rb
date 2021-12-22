@@ -8,6 +8,16 @@ Class.module_eval do
   end
 end
 
+module KQL
+  def self.parse_query(query)
+    Parser.new.parse(query)
+  end
+
+  def self.query_document(document, query)
+    parse_query(query).execute(document)
+  end
+end
+
 require_relative "kql/version"
 require_relative "kql/tokenizer"
 require_relative "kql/query"
