@@ -64,6 +64,115 @@ class TokenizerTest < Minitest::Test
     assert_equal [false, nil], tokenizer.next_token
   end
 
+  def test_val
+    tokenizer = ::KQL::Tokenizer.new('[val()]')
+
+    assert_equal t(:LBRACKET, '['), tokenizer.next_token
+    assert_equal t(:VAL, 'val'), tokenizer.next_token
+    assert_equal t(:LPAREN, '('), tokenizer.next_token
+    assert_equal t(:RPAREN, ')'), tokenizer.next_token
+    assert_equal t(:RBRACKET, ']'), tokenizer.next_token
+    assert_equal [false, nil], tokenizer.next_token
+  end
+
+  def test_val_index
+    tokenizer = ::KQL::Tokenizer.new('[val(3)]')
+
+    assert_equal t(:LBRACKET, '['), tokenizer.next_token
+    assert_equal t(:VAL, 'val'), tokenizer.next_token
+    assert_equal t(:LPAREN, '('), tokenizer.next_token
+    assert_equal t(:INTEGER, 3), tokenizer.next_token
+    assert_equal t(:RPAREN, ')'), tokenizer.next_token
+    assert_equal t(:RBRACKET, ']'), tokenizer.next_token
+    assert_equal [false, nil], tokenizer.next_token
+  end
+
+  def test_prop
+    tokenizer = ::KQL::Tokenizer.new('[prop(foo)]')
+
+    assert_equal t(:LBRACKET, '['), tokenizer.next_token
+    assert_equal t(:PROP, 'prop'), tokenizer.next_token
+    assert_equal t(:LPAREN, '('), tokenizer.next_token
+    assert_equal t(:IDENT, 'foo'), tokenizer.next_token
+    assert_equal t(:RPAREN, ')'), tokenizer.next_token
+    assert_equal t(:RBRACKET, ']'), tokenizer.next_token
+    assert_equal [false, nil], tokenizer.next_token
+  end
+
+  def test_prop_bare
+    tokenizer = ::KQL::Tokenizer.new('[foo]')
+
+    assert_equal t(:LBRACKET, '['), tokenizer.next_token
+    assert_equal t(:IDENT, 'foo'), tokenizer.next_token
+    assert_equal t(:RBRACKET, ']'), tokenizer.next_token
+    assert_equal [false, nil], tokenizer.next_token
+  end
+
+  def test_prop_bare_val
+    tokenizer = ::KQL::Tokenizer.new('[val]')
+
+    assert_equal t(:LBRACKET, '['), tokenizer.next_token
+    assert_equal t(:IDENT, 'val'), tokenizer.next_token
+    assert_equal t(:RBRACKET, ']'), tokenizer.next_token
+    assert_equal [false, nil], tokenizer.next_token
+  end
+
+  def test_prop_bare_prop
+    tokenizer = ::KQL::Tokenizer.new('[prop]')
+
+    assert_equal t(:LBRACKET, '['), tokenizer.next_token
+    assert_equal t(:IDENT, 'prop'), tokenizer.next_token
+    assert_equal t(:RBRACKET, ']'), tokenizer.next_token
+    assert_equal [false, nil], tokenizer.next_token
+  end
+
+  def test_prop_matcher
+    tokenizer = ::KQL::Tokenizer.new('[prop(foo) = 1]')
+
+    assert_equal t(:LBRACKET, '['), tokenizer.next_token
+    assert_equal t(:PROP, 'prop'), tokenizer.next_token
+    assert_equal t(:LPAREN, '('), tokenizer.next_token
+    assert_equal t(:IDENT, 'foo'), tokenizer.next_token
+    assert_equal t(:RPAREN, ')'), tokenizer.next_token
+    assert_equal t(:EQUALS, '='), tokenizer.next_token
+    assert_equal t(:INTEGER, 1), tokenizer.next_token
+    assert_equal t(:RBRACKET, ']'), tokenizer.next_token
+    assert_equal [false, nil], tokenizer.next_token
+  end
+
+  def test_prop_bare_matcher
+    tokenizer = ::KQL::Tokenizer.new('[foo = 1]')
+
+    assert_equal t(:LBRACKET, '['), tokenizer.next_token
+    assert_equal t(:IDENT, 'foo'), tokenizer.next_token
+    assert_equal t(:EQUALS, '='), tokenizer.next_token
+    assert_equal t(:INTEGER, 1), tokenizer.next_token
+    assert_equal t(:RBRACKET, ']'), tokenizer.next_token
+    assert_equal [false, nil], tokenizer.next_token
+  end
+
+  def test_prop_bare_val_matcher
+    tokenizer = ::KQL::Tokenizer.new('[val = 1]')
+
+    assert_equal t(:LBRACKET, '['), tokenizer.next_token
+    assert_equal t(:IDENT, 'val'), tokenizer.next_token
+    assert_equal t(:EQUALS, '='), tokenizer.next_token
+    assert_equal t(:INTEGER, 1), tokenizer.next_token
+    assert_equal t(:RBRACKET, ']'), tokenizer.next_token
+    assert_equal [false, nil], tokenizer.next_token
+  end
+
+  def test_prop_bare_prop_matcher
+    tokenizer = ::KQL::Tokenizer.new('[prop = 1]')
+
+    assert_equal t(:LBRACKET, '['), tokenizer.next_token
+    assert_equal t(:IDENT, 'prop'), tokenizer.next_token
+    assert_equal t(:EQUALS, '='), tokenizer.next_token
+    assert_equal t(:INTEGER, 1), tokenizer.next_token
+    assert_equal t(:RBRACKET, ']'), tokenizer.next_token
+    assert_equal [false, nil], tokenizer.next_token
+  end
+
   private
 
   def t(type, value, line = nil, col = nil)

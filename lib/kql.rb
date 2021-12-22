@@ -3,6 +3,7 @@
 Class.module_eval do
   def singleton(classname, superclass = nil, &block)
     klass = Class.new(superclass, &block)
+    const_set(:"#{classname}Impl", klass)
     const_set(classname, klass.new)
   end
 end

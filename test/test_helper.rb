@@ -2,6 +2,7 @@
 
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 require "kql"
+require "kdl"
 
 require "minitest/autorun"
 
@@ -104,5 +105,33 @@ class Minitest::Test
   def m(acc, op, val)
     val = val.is_a?(::KQL::Matcher) ? val : ::KQL::Matcher::Value.new(val)
     ::KQL::Matcher::Comparison.new(acc, operator(op), val)
+  end
+
+  def assert_query_fetches(query, expected)
+    actual = @parser.parse(query).execute(document)
+    actual = actual.first if actual.is_a?(Array) && actual.size == 1
+    actual = simplify(actual)
+    assert expected == actual, "expected:\n#{to_string(expected)}\n\nactual:\n#{to_string(actual)}"
+  end
+
+  def simplify(x)
+    case x
+    when ::KDL::Value then x.value
+    when Array then x.map { |e| simplify(e) }
+    when Hash then x.transform_values { |e| simplify(e) }
+    else x
+    end
+  end
+
+  def to_string(thing)
+    if thing.is_a?(Array)
+      if thing[0].is_a?(::KDL::Node)
+        thing.map(&:to_s).join(",\n")
+      else
+        "[#{thing.map(&:inspect).join(',')}]"
+      end
+    else
+      thing.to_s
+    end
   end
 end

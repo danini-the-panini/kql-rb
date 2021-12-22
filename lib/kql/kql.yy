@@ -71,7 +71,7 @@ rule
                    | INCLUDES    { ::KQL::Operator::Includes }
 
   mapping : accessor
-          | LPAREN mapping_tuple RPAREN { val[1] }
+          | LPAREN mapping_tuple RPAREN { ::KQL::Accessor::Tuple.new(val[1]) }
 
   mapping_tuple : accessor COMMA mapping_tuple { [val[0], *val[2]] }
                 | accessor                     { [val[0]] }

@@ -1,30 +1,57 @@
 module KQL
   class Operator
-    class Equals < Operator
+    singleton :Equals, Operator do
+      def execute(a, b)
+        a == b
+      end
     end
 
-    class NotEquals < Operator
+    singleton :NotEquals, Operator do
+      def execute(a, b)
+        a != b
+      end
     end
 
-    class GreaterThanOrEqual < Operator
+    singleton :GreaterThanOrEqual, Operator do
+      def execute(a, b)
+        a >= b
+      end
     end
 
-    class GreaterThan < Operator
+    singleton :GreaterThan, Operator do
+      def execute(a, b)
+        a > b
+      end
     end
 
-    class LessThanOrEqual < Operator
+    singleton :LessThanOrEqual, Operator do
+      def execute(a, b)
+        a <= b
+      end
     end
 
-    class LessThan < Operator
+    singleton :LessThan, Operator do
+      def execute(a, b)
+        a < b
+      end
     end
 
-    class StartsWith < Operator
+    singleton :StartsWith, Operator do
+      def execute(a, b)
+        a.start_with?(b)
+      end
     end
 
-    class EndsWith < Operator
+    singleton :EndsWith, Operator do
+      def execute(a, b)
+        a.end_with?(b)
+      end
     end
 
-    class Includes < Operator
+    singleton :Includes, Operator do
+      def execute(a, b)
+        a.include?(b)
+      end
     end
   end
 end

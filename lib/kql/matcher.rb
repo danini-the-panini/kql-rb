@@ -1,22 +1,40 @@
 module KQL
   class Matcher
-    class Any < Matcher
+    singleton :Any, Matcher do
+      def match?(node)
+        true
+      end
     end
 
-    class AnyTag < Matcher
+    singleton :AnyTag, Matcher do
+      def match?(node)
+        !node.type.nil?
+      end
     end
 
     class Tag < Matcher
       attr_reader :tag
+      alias value tag
 
       def initialize(tag)
         @tag = tag
+      end
+
+      def match?(node)
+        node.type == tag
       end
 
       def ==(other)
         return false unless other.is_a?(Tag)
 
         other.tag == tag
+      end
+
+      def coerce(a)
+        case a
+        when ::KDL::Node, ::KDL::Value then a.type
+        else a
+        end
       end
     end
 
@@ -32,6 +50,13 @@ module KQL
 
         other.value == value
       end
+
+      def coerce(a)
+        case a
+        when ::KDL::Value then a.value
+        else a
+        end
+      end
     end
 
     class Comparison < Matcher
@@ -41,6 +66,12 @@ module KQL
         @accessor = accessor
         @operator = operator
         @value = value
+      end
+
+      def match?(node)
+        return false unless accessor.match?(node)
+
+        operator.execute(value.coerce(accessor.execute(node)), value.value)
       end
 
       def ==(other)

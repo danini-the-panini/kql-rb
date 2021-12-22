@@ -199,9 +199,9 @@ module KQL
                 return token(@buffer.upcase.to_sym, "#{@buffer}()").tap { traverse(2) }
               end
             when 'val'
-              return token(:VAL, @buffer)
+              return token(:VAL, @buffer) if c == '('
             when 'prop'
-              return token(:PROP, @buffer)
+              return token(:PROP, @buffer) if c == '('
             end
             return token(:IDENT, @buffer)
           end

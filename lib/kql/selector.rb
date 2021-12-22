@@ -12,6 +12,10 @@ module KQL
       other.filter == filter
     end
 
+    def execute(context)
+      filter.execute(context)
+    end
+
     class Combined < Selector
       attr_reader :combinator, :selector
 
@@ -27,6 +31,10 @@ module KQL
         other.filter == filter &&
           other.combinator == combinator &&
           other.selector == selector
+      end
+
+      def execute(context)
+        combinator.execute(super, selector)
       end
     end
   end
