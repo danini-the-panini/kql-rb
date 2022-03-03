@@ -60,6 +60,7 @@ module KQL
 
     def initialize(str, start = 0)
       @str = str
+      @rawstring_hashes = nil
       @context = nil
       @index = start
       @buffer = ''
@@ -82,6 +83,30 @@ module KQL
           when '"'
             self.context = :string
             @buffer = ''
+            traverse(1)
+          when 'r'
+            if @str[@index + 1] == '"'
+              self.context = :rawstring
+              traverse(2)
+              @rawstring_hashes = 0
+              @buffer = ''
+              next
+            elsif @str[@index + 1] == '#'
+              i = @index + 1
+              @rawstring_hashes = 0
+              while @str[i] == '#'
+                @rawstring_hashes += 1
+                i += 1
+              end
+              if @str[i] == '"'
+                self.context = :rawstring
+                @index = i + 1
+                @buffer = ''
+                next
+              end
+            end
+            self.context = :ident
+            @buffer = c
             traverse(1)
           when /[0-9\-]/
             self.context = :number
@@ -219,6 +244,21 @@ module KQL
             @buffer += c
             traverse(1)
           end
+        when :rawstring
+          raise_error "Unterminated rawstring literal" if c.nil?
+
+          if c == '"'
+            h = 0
+            while @str[@index + 1 + h] == '#' && h < @rawstring_hashes
+              h += 1
+            end
+            if h == @rawstring_hashes
+              return token(:RAWSTRING, @buffer).tap { traverse(1 + h) }
+            end
+          end
+
+          @buffer += c
+          traverse(1)
         when :number
           case c
           when /[0-9.\-+_eE]/

@@ -11,6 +11,20 @@ class TokenizerTest < Minitest::Test
     assert_equal t(:STRING, "foo\nbar"), ::KQL::Tokenizer.new('"foo\nbar"').next_token
   end
 
+  def test_string
+    assert_equal t(:STRING, "foo"), ::KQL::Tokenizer.new('"foo"').next_token
+    assert_equal t(:STRING, "foo\nbar"), ::KQL::Tokenizer.new('"foo\nbar"').next_token
+  end
+
+  def test_rawstring
+    assert_equal t(:RAWSTRING, "foo\\nbar"), ::KQL::Tokenizer.new('r"foo\\nbar"').next_token
+    assert_equal t(:RAWSTRING, "foo\"bar"), ::KQL::Tokenizer.new('r#"foo"bar"#').next_token
+    assert_equal t(:RAWSTRING, "foo\"#bar"), ::KQL::Tokenizer.new('r##"foo"#bar"##').next_token
+    assert_equal t(:RAWSTRING, "\"foo\""), ::KQL::Tokenizer.new('r#""foo""#').next_token
+    assert_equal t(:RAWSTRING, "C:\\Users\\zkat\\"), ::KQL::Tokenizer.new('r"C:\\Users\\zkat\\"').next_token
+    assert_equal t(:RAWSTRING, "hello\"world"), ::KQL::Tokenizer.new('r#"hello"world"#').next_token
+  end
+
   def test_number
     assert_equal t(:INTEGER, 123), ::KQL::Tokenizer.new("123").next_token
     assert_equal t(:FLOAT, 1.23), ::KQL::Tokenizer.new("1.23").next_token

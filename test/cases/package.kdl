@@ -1,0 +1,107 @@
+input {
+  package {
+    name "foo"
+    version "1.0.0"
+    dependencies platform="windows" {
+      winapi "1.0.0" path="./crates/my-winapi-fork"
+    }
+    dependencies {
+      miette "2.0.0" dev=true
+    }
+    lastBuiltAt 12345
+  }
+}
+
+query "top() > package dependencies[prop(platform) = \"windows\"]" {
+  dependencies platform="windows" {
+    winapi "1.0.0" path="./crates/my-winapi-fork"
+  }
+}
+query "top() > package dependencies[prop(platform) != \"windows\"]" {
+  dependencies {
+    miette "2.0.0" dev=true
+  }
+}
+query "top() > package dependencies[prop(platform) != r#\"windows\"#] || top() > package dependencies[prop(platform) = \"windows\"]" {
+  dependencies {
+    miette "2.0.0" dev=true
+  }
+  dependencies platform="windows" {
+    winapi "1.0.0" path="./crates/my-winapi-fork"
+  }
+}
+query "dependencies" {
+  dependencies platform="windows" {
+    winapi "1.0.0" path="./crates/my-winapi-fork"
+  }
+  dependencies {
+    miette "2.0.0" dev=true
+  }
+}
+query "dependencies[prop(platform) ^= \"win\"]" {
+  dependencies platform="windows" {
+    winapi "1.0.0" path="./crates/my-winapi-fork"
+  }
+}
+query "dependencies[prop(platform) $= \"s\"]" {
+  dependencies platform="windows" {
+    winapi "1.0.0" path="./crates/my-winapi-fork"
+  }
+}
+query "dependencies[prop(platform) *= \"in\"]" {
+  dependencies platform="windows" {
+    winapi "1.0.0" path="./crates/my-winapi-fork"
+  }
+}
+query "dependencies[prop(platform)]" {
+  dependencies platform="windows" {
+    winapi "1.0.0" path="./crates/my-winapi-fork"
+  }
+}
+query "dependencies[platform]" {
+  dependencies platform="windows" {
+    winapi "1.0.0" path="./crates/my-winapi-fork"
+  }
+}
+query "dependencies[platform = \"windows\"]" {
+  dependencies platform="windows" {
+    winapi "1.0.0" path="./crates/my-winapi-fork"
+  }
+}
+query "lastBuiltAt[val() > 0]" {
+  lastBuiltAt 12345
+}
+query "lastBuiltAt[val() >= 0]" {
+  lastBuiltAt 12345
+}
+query "lastBuiltAt[val() < 9999999]" {
+  lastBuiltAt 12345
+}
+query "lastBuiltAt[val() <= 9999999]" {
+  lastBuiltAt 12345
+}
+query "dependencies + dependencies" {
+  dependencies {
+    miette "2.0.0" dev=true
+  }
+}
+query "version ~ dependencies" {
+  dependencies platform="windows" {
+    winapi "1.0.0" path="./crates/my-winapi-fork"
+  }
+  dependencies {
+    miette "2.0.0" dev=true
+  }
+}
+query "dependencies[prop(platform) ^= \"win\"] top() package > version" {
+  version "1.0.0"
+}
+query "version" {
+  version "1.0.0"
+}
+query "name" {
+  name "foo"
+}
+query "lastBuiltAt[val()]" {
+  lastBuiltAt 12345
+}

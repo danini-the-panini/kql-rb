@@ -2,13 +2,13 @@ module KQL
   class Combinator
     singleton :Child, Combinator do
       def execute(context, selector)
-        selector.execute(Query::Context.new(context.children))
+        selector.execute(Query::Context.new(context.top, context.children))
       end
     end
 
     singleton :ImmediateChild, Combinator do
       def execute(context, selector)
-        selector.execute(Query::Context.new(context.children(stop: true)))
+        selector.execute(Query::Context.new(context.top, context.children(stop: true)))
       end
     end
 
@@ -21,7 +21,7 @@ module KQL
                                       .select { |n, i| i > node.index }
                                       .map { |n, i| Query::SelectedNode.new(n, node.node.children, i, stop: true) }
                                 }
-        selector.execute(Query::Context.new(selected_nodes))
+        selector.execute(Query::Context.new(context.top, selected_nodes))
       end
     end
 
@@ -34,7 +34,7 @@ module KQL
                                       .select { |n, i| i == node.index + 1 }
                                       .map { |n, i| Query::SelectedNode.new(n, node.node.children, i, stop: true) }
                                 }
-        selector.execute(Query::Context.new(selected_nodes))
+        selector.execute(Query::Context.new(context.top, selected_nodes))
       end
     end
   end

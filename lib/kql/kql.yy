@@ -1,7 +1,7 @@
 class KQL::Parser
   options no_result_var
   token IDENT
-        STRING INTEGER FLOAT TRUE FALSE NULL
+        STRING RAWSTRING INTEGER FLOAT TRUE FALSE NULL
         LPAREN RPAREN
         LBRACKET RBRACKET
         COMMA
@@ -55,6 +55,7 @@ rule
   matcher_comparison : INTEGER             { ::KQL::Matcher::Value.new(val[0].value) }
                      | FLOAT               { ::KQL::Matcher::Value.new(val[0].value) }
                      | STRING              { ::KQL::Matcher::Value.new(val[0].value) }
+                     | RAWSTRING           { ::KQL::Matcher::Value.new(val[0].value) }
                      | NULL                { ::KQL::Matcher::Value.new(nil) }
                      | TRUE                { ::KQL::Matcher::Value.new(true) }
                      | FALSE               { ::KQL::Matcher::Value.new(false) }

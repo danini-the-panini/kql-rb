@@ -27,8 +27,27 @@ class QueryTest < Minitest::Test
                                         doc.nodes.first.children[1].children.first,
                                         doc.nodes.first.children[1]])
     assert_query_fetches('a + b', doc.nodes[1])
+    assert_query_fetches('b + b', doc.nodes[2])
+    assert_query_fetches('b + c', doc.nodes.first.children[1])
     assert_query_fetches('a ~ b', [doc.nodes[1], doc.nodes[2]])
     assert_query_fetches('[]', all_nodes)
+  end
+
+  def test_immediate_sibling
+    @doc = parse <<~KDL
+    a {
+      foo "bar"
+      qux "baz"
+      b norf="wat" {
+        c
+      }
+      b {
+        c d=2
+      }
+    }
+    KDL
+
+    assert_query_fetches('b + b', doc.nodes.first.children[3])
   end
 
   def test_matchers
