@@ -23,10 +23,11 @@ module KQL
     private
 
     class Context
-      attr_accessor :selected_nodes
+      attr_accessor :selected_nodes, :top
 
-      def initialize(selected_nodes)
+      def initialize(top, selected_nodes)
         @selected_nodes = selected_nodes
+        @top = top
       end
 
       def nodes
@@ -40,10 +41,6 @@ module KQL
               .map { |n, i| Query::SelectedNode.new(n, node.children, i, **kwargs) }
         end
       end
-
-      def top?
-        false
-      end
     end
 
     class TopContext < Context
@@ -51,15 +48,11 @@ module KQL
 
       def initialize(document)
         @document = document
-        super(children)
+        super(self, children)
       end
 
       def children(**kwargs)
         document.nodes.each_with_index.map { |n, i| Query::SelectedNode.new(n, document.nodes, i, **kwargs) }
-      end
-
-      def top?
-        true
       end
     end
 

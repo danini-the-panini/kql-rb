@@ -50,6 +50,12 @@ class ParserTest < Minitest::Test
     assert_equal q(sel(matchers: [m(val(0), :==, ::KQL::Matcher::Tag.new('foo'))])), @parser.parse('[val() = (foo)]')
   end
 
+  def test_rawstring
+    assert_equal q(sel(matchers: [m(val(0), :==, 'foo')])), @parser.parse('[val() = r"foo"]')
+    assert_equal q(sel(matchers: [m(val(0), :==, 'foo')])), @parser.parse('[val() = r#"foo"#]')
+    assert_equal q(sel(matchers: [m(val(0), :==, 'foo')])), @parser.parse('[val() = r##"foo"##]')
+  end
+
   def test_numeric_matchers
     assert_equal q(sel(matchers: [m(val(0), :>, 1)])), @parser.parse('[val() > 1]')
     assert_equal q(sel(matchers: [m(val(0), :>=, 1)])), @parser.parse('[val() >= 1]')

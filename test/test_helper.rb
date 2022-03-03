@@ -110,6 +110,7 @@ class Minitest::Test
   def assert_query_fetches(query, expected)
     actual = @parser.parse(query).execute(document)
     actual = actual.first if actual.is_a?(Array) && actual.size == 1
+    expected = expected.first if expected.is_a?(Array) && expected.size == 1
     actual = simplify(actual)
     assert expected == actual, "expected:\n#{to_string(expected)}\n\nactual:\n#{to_string(actual)}"
   end
